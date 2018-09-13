@@ -1,0 +1,98 @@
+/******************************/
+example3:"tensorflow-for-poets-2" //working
+
+git clone https://github.com/googlecodelabs/tensorflow-for-poets-2
+cd tensorflow-for-poets-2
+
+IMAGE_SIZE=224
+ARCHITECTURE="inception_v3"
+
+IMAGE_SIZE=224
+ARCHITECTURE="mobilenet_0.50_${IMAGE_SIZE}"
+
+pkill -f "tensorboard"
+tensorboard --logdir tf_files/training_summaries &
+
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+
+python -m scripts.retrain -h
+
+python -m scripts.retrain \
+  --bottleneck_dir=tf_files/bottlenecks \
+  --how_many_training_steps=10000 \
+  --learning_rate=0.0001 \
+  --model_dir=tf_files/models/ \
+  --summaries_dir=tf_files/training_summaries/color/"${ARCHITECTURE}" \
+  --output_graph=tf_files/retrained_graph_color.pb \
+  --output_labels=tf_files/retrained_labels_color.txt \
+  --architecture="${ARCHITECTURE}" \
+  --image_dir=tf_files/color-cropped
+
+_iv  and _mobile
+--output_graph=tf_files/retrained_graph_face_shape_color_resized_iv.pb \
+--output_labels=tf_files/retrained_labels_face_shape_color_resized_iv.txt \
+//label
+
+python -m  scripts.label_image -h
+
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb \
+    --labels=tf_files/retrained_labels.txt\
+    --input_layer=Mul --input_height=299 --input_width=299 \
+    --image=tf_files/face_shape_bw-cropped/oval/0000167.jpg
+
+
+python -m scripts.label_image \
+    --graph=tf_files/retrained_graph.pb \
+    --labels=tf_files/retrained_labels.txt \
+    --input_layer=Mul --input_height=299 --input_width=299 \
+    --image=tf_files/flower_photos/roses/2414954629_3708a1a04d.jpg
+
+python -m scripts.label_image \
+        --graph=tf_files/retrained_graph.pb  \
+        --image=$HOME/brain/rose_photos/Z.jpg
+
+python -m scripts.label_image \
+        --graph=tf_files/retrained_graph.pb  \
+        --image=$HOME/brain/1.jpg
+
+
+/**************************GENDER DETECTION *********/
+
+IMAGE_SIZE=224
+ARCHITECTURE="mobilenet_0.50_${IMAGE_SIZE}"
+
+pkill -f "tensorboard"
+tensorboard --logdir tf_files/training_summaries &
+
+
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+
+python -m scripts.retrain -h
+
+
+python -m scripts.retrain \
+  --bottleneck_dir=tf_files/bottlenecks \
+  --how_many_training_steps=500 \
+  --model_dir=tf_files/models/ \
+  --summaries_dir=tf_files/training_summaries/"${ARCHITECTURE}" \
+  --output_graph=tf_files/retrained_graph_gender.pb \
+  --output_labels=tf_files/retrained_labels_gender.txt \
+  --architecture="${ARCHITECTURE}" \
+  --image_dir=tf_files/gender_photos
+
+
+python -m scripts.label_image \
+        --graph=tf_files/retrained_graph.pb  \
+        --image=$HOME/brain/gender_photos/1.jpg
+
+
+python -m scripts.label_image \
+      --graph=tf_files/retrained_graph.pb  \
+      --labels=tf_files/retrained_labels_gender.txt \
+      --image=tf_files/gender_photos/female/imagesxx.jpg
